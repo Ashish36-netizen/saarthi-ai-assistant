@@ -33,7 +33,7 @@ SAARTHI is an AI-powered desktop voice assistant built with Python. It listens t
 
 ## Project Status
 
-Under Development - B.Tech Minor Project (Final Year)
+Under Development - B.Tech Minor Project (Pre-Final Year)
 
 ## Author
 
