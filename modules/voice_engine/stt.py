@@ -26,7 +26,15 @@ class SpeechToText:
         return np.squeeze(audio)
 
     def transcribe(self, audio):
-        """Convert audio numpy array to text."""
-        segments, info = self.model.transcribe(audio, beam_size=5)
-        text = " ".join(seg.text for seg in segments).strip()
+        """Convert audio to text, filtering out noise/silence via VAD."""
+        segments, info = self.model.transcribe(
+            audio,
+            beam_size=5,
+            vad_filter=True,                # Voice Activity Detection
+            vad_parameters={"min_silence_duration_ms": 500},
+        )
+
+        # Only keep segments with high speech probability
+        valid_segments = [seg for seg in segments if seg.no_speech_prob < 0.5]
+        text = " ".join(seg.text for seg in valid_segments).strip()
         return text
