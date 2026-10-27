@@ -85,9 +85,11 @@ class SystemControl:
     # ---------- Screenshot ----------
     def take_screenshot(self):
         try:
+            import mss
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"screenshot_{timestamp}.png"
-            pyautogui.screenshot(filename)
+            with mss.mss() as sct:
+                sct.shot(output=filename)
             return f"Screenshot le liya: {filename}"
         except Exception as e:
             return f"Screenshot nahi le paya. Error: {e}"
