@@ -19,12 +19,15 @@ class LLMBrain:
             print(f"[LLM] Ollama not available: {e}")
             return False
 
-    def generate_response(self, user_text, system_prompt=None):
-        """Generate AI response for user input."""
+    def generate_response(self, user_text, system_prompt=None, memory=None):
+        """Generate AI response, optionally with conversation memory."""
         messages = []
 
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
+
+        if memory:
+            messages.extend(memory.get_history())
 
         messages.append({"role": "user", "content": user_text})
 
@@ -32,9 +35,10 @@ class LLMBrain:
             response = self.client.chat(
                 model=self.model,
                 messages=messages,
-                options={
+                 options={
                     "temperature": 0.7,
-                    "num_predict": 200,  # max tokens (short answers)
+                    "num_predict": 300,
+                    "num_ctx": 2048,
                 },
             )
             return response["message"]["content"].strip()

@@ -26,15 +26,21 @@ class SpeechToText:
         return np.squeeze(audio)
 
     def transcribe(self, audio):
-        """Convert audio to text, filtering out noise/silence via VAD."""
+        """Convert audio to text with VAD and noise filtering."""
         segments, info = self.model.transcribe(
             audio,
             beam_size=5,
-            vad_filter=True,                # Voice Activity Detection
+            language=None,
+            vad_filter=True,
             vad_parameters={"min_silence_duration_ms": 500},
         )
 
-        # Only keep segments with high speech probability
-        valid_segments = [seg for seg in segments if seg.no_speech_prob < 0.5]
+        # Only reject clearly non-speech languages (not Hinglish misdetections)
+        if info.language not in ("en", "hi", "ur", "bn"):
+            print(f"[STT] Rejected - detected language: {info.language}")
+            return ""
+
+        # Only reject segments with low speech probability
+        valid_segments = [seg for seg in segments if seg.no_speech_prob < 0.6]
         text = " ".join(seg.text for seg in valid_segments).strip()
         return text
